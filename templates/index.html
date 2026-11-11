@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="card">
+  <h1>Sube un PDF para analizarlo</h1>
+  <p class="muted">Extrae metadatos, estadísticas, palabras clave, tablas y permite buscar términos.</p>
+  <form action="{{ url_for('analizar') }}" method="post" enctype="multipart/form-data">
+    <label>Archivo PDF (máx. 25 MB)
+      <input type="file" name="pdf" accept="application/pdf,.pdf" required>
+    </label>
+    <label>Buscar palabra o frase (opcional)
+      <input type="text" name="term" placeholder="p. ej. metodología">
+    </label>
+    <button type="submit">Analizar</button>
+  </form>
+</section>
+{% endblock %}

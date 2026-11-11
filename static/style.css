@@ -1,0 +1,26 @@
+:root { --bg:#f6f7f9; --card:#fff; --text:#1d2330; --muted:#667085; --accent:#2f5bea; --line:#e4e7ec; }
+@media (prefers-color-scheme: dark) {
+  :root { --bg:#14171f; --card:#1c212c; --text:#e8eaf0; --muted:#98a2b3; --accent:#6b8cff; --line:#2d3444; }
+}
+* { box-sizing: border-box; }
+body { margin:0; font-family: system-ui, sans-serif; background:var(--bg); color:var(--text); line-height:1.5; }
+header { padding:1rem 1.5rem; background:var(--card); border-bottom:1px solid var(--line); }
+header a { color:var(--text); text-decoration:none; font-weight:600; }
+main { max-width:900px; margin:2rem auto; padding:0 1rem; }
+.card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:1.25rem; margin-bottom:1rem; }
+.muted { color:var(--muted); }
+label { display:block; margin:1rem 0; font-weight:500; }
+input[type=text], input[type=file] { display:block; width:100%; margin-top:.4rem; padding:.6rem; border:1px solid var(--line); border-radius:8px; background:var(--bg); color:var(--text); }
+button, .btn { background:var(--accent); color:#fff; border:0; padding:.6rem 1.2rem; border-radius:8px; cursor:pointer; text-decoration:none; display:inline-block; font-size:1rem; }
+.btn.alt { background:transparent; color:var(--accent); border:1px solid var(--accent); }
+.flash { background:#fff4d6; color:#5c4400; padding:.75rem 1rem; border-radius:8px; margin-bottom:1rem; }
+.stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:.75rem; margin-bottom:1rem; }
+.stats div { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:1rem; text-align:center; }
+.stats b { display:block; font-size:1.6rem; }
+.stats span { color:var(--muted); font-size:.85rem; }
+.tag { display:inline-block; background:var(--bg); border:1px solid var(--line); border-radius:999px; padding:.2rem .8rem; margin:.2rem; }
+.tag small { color:var(--muted); }
+.scroll { overflow-x:auto; }
+table { border-collapse:collapse; width:100%; font-size:.9rem; }
+th, td { border-bottom:1px solid var(--line); padding:.4rem .6rem; text-align:left; vertical-align:top; }
+.prev { color:var(--muted); max-width:380px; }

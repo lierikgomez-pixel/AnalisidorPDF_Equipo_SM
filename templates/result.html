@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}{{ d.filename }} · Análisis{% endblock %}
+{% block content %}
+<h1>{{ d.filename }}</h1>
+
+<div class="stats">
+  <div><b>{{ d.pages }}</b><span>páginas</span></div>
+  <div><b>{{ d.total_words }}</b><span>palabras</span></div>
+  <div><b>{{ d.unique_words }}</b><span>únicas</span></div>
+  <div><b>{{ d.reading_minutes }}</b><span>min. lectura</span></div>
+  <div><b>{{ d.tables|length }}</b><span>tablas</span></div>
+</div>
+
+{% if not d.has_text %}
+<div class="flash">No se encontró texto. Probablemente es un PDF escaneado (imágenes); necesitarías OCR.</div>
+{% endif %}
+
+<section class="card">
+  <h2>Metadatos</h2>
+  {% if d.metadata %}
+  <table>{% for k, v in d.metadata.items() %}<tr><th>{{ k }}</th><td>{{ v }}</td></tr>{% endfor %}</table>
+  {% else %}<p class="muted">Sin metadatos.</p>{% endif %}
+</section>
+
+<section class="card">
+  <h2>Palabras clave</h2>
+  {% for w, c in d.top_keywords %}<span class="tag">{{ w }} <small>{{ c }}</small></span>{% else %}
+  <p class="muted">Sin datos.</p>{% endfor %}
+</section>
+
+{% if d.search is defined %}
+<section class="card">
+  <h2>Búsqueda: “{{ d.search.term }}” — {{ d.search.count }} coincidencias</h2>
+  {% for m in d.search.matches %}
+    <p><b>Pág. {{ m.page }}:</b> …{{ m.context }}…</p>
+  {% else %}<p class="muted">Sin coincidencias.</p>{% endfor %}
+</section>
+{% endif %}
+
+<section class="card">
+  <h2>Detalle por página</h2>
+  <div class="scroll"><table>
+    <tr><th>Pág.</th><th>Palabras</th><th>Imágenes</th><th>Tablas</th><th>Vista previa</th></tr>
+    {% for p in d.page_details %}
+    <tr><td>{{ p.page }}</td><td>{{ p.words }}</td><td>{{ p.images }}</td><td>{{ p.tables }}</td>
+        <td class="prev">{{ p.preview }}</td></tr>
+    {% endfor %}
+  </table></div>
+</section>
+
+{% if d.tables %}
+<section class="card">
+  <h2>Tablas detectadas</h2>
+  {% for t in d.tables %}
+    <h3>Página {{ t.page }}</h3>
+    <div class="scroll"><table>
+      {% for row in t.rows %}<tr>{% for cell in row %}<td>{{ cell or '' }}</td>{% endfor %}</tr>{% endfor %}
+    </table></div>
+  {% endfor %}
+</section>
+{% endif %}
+
+<p>
+  <a class="btn" href="{{ url_for('descargar_texto', rid=rid) }}">⬇ Descargar texto (.txt)</a>
+  <a class="btn alt" href="{{ url_for('index') }}">Analizar otro</a>
+</p>
+{% endblock %}
