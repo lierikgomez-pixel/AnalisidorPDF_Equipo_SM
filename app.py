@@ -6,6 +6,7 @@ from flask import (Flask, flash, jsonify, redirect, render_template, request,
 from werkzeug.utils import secure_filename
 
 from analyzer import analyze_pdf
+from citation import format_apa
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 UPLOAD_DIR = os.path.join(BASE_DIR, "uploads")
@@ -28,7 +29,7 @@ def save_and_analyze(file, term):
     path = os.path.join(UPLOAD_DIR, f"{uuid.uuid4().hex}_{name}")
     file.save(path)
     try:
-        return name, analyze_pdf(path, search_term=term)
+        return name, analyze_pdf(path, search_term=term, filename=name)
     finally:
         os.remove(path)  # no conservamos el archivo subido
 
@@ -90,6 +91,13 @@ def api_analyze():
         return jsonify(error=str(e)), 422
     data.pop("full_text", None)
     return jsonify(data)
+
+
+@app.route("/api/apa", methods=["POST"])
+def api_apa():
+    """Recalcula la cita APA a partir de los campos editados en la ficha."""
+    data = request.get_json(silent=True) or {}
+    return jsonify(format_apa(data))
 
 
 @app.errorhandler(413)

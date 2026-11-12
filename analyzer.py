@@ -5,6 +5,8 @@ from collections import Counter
 import pdfplumber
 from pypdf import PdfReader
 
+from citation import extract_citation
+
 # Palabras vacías comunes en español e inglés
 STOPWORDS = set("""
 a al algo algunas algunos ante antes como con contra cual cuando de del desde donde durante e el ella ellas ellos en
@@ -26,7 +28,7 @@ def _clean_meta(meta):
     return out
 
 
-def analyze_pdf(path, search_term=None, top_n=15):
+def analyze_pdf(path, search_term=None, top_n=15, filename=None):
     """Analiza un PDF y devuelve un diccionario con los resultados."""
     reader = PdfReader(path)
     if reader.is_encrypted:
@@ -60,6 +62,16 @@ def analyze_pdf(path, search_term=None, top_n=15):
                 "preview": text[:400],
             })
             all_text.append(text)
+
+        # Ficha bibliográfica (título, autores, año, lugar...) y cita APA
+        try:
+            result["citation"] = extract_citation(pdf, reader.metadata, all_text, filename)
+        except Exception as e:  # la cita nunca debe romper el análisis
+            result["citation"] = {"fields": {"tipo": "documento", "idioma": "es", "titulo": "", "autores": [],
+                                             "anio": "", "fecha": "", "lugar": "", "editorial": "", "revista": "",
+                                             "volumen": "", "numero": "", "paginas": "", "doi": "", "grado": ""},
+                                  "sources": {}, "apa": {"text": "", "html": ""}, "crossref": False,
+                                  "error": str(e)}
 
     full_text = "\n".join(all_text)
     words = [w.lower() for w in WORD_RE.findall(full_text)]

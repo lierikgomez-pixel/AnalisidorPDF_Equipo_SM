@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-<<<<<<< HEAD
 {% from "_icons.html" import asterisk, arrow, chevron %}
 {% block title %}{{ d.filename }} · Análisis{% endblock %}
 {% block content %}
@@ -21,6 +20,89 @@
     <div><strong>{{ d.reading_minutes }}</strong><span>min. de lectura</span></div>
     <div><strong>{{ d.tables|length }}</strong><span>tablas</span></div>
   </div>
+
+
+  {% set c = d.citation %}
+  <section class="block ficha-block">
+    <h2>Ficha bibliográfica</h2>
+    <p class="muted small">Datos detectados automáticamente. Corrige lo que haga falta y la cita APA se actualiza sola.</p>
+
+    <form id="ficha" class="ficha" autocomplete="off" onsubmit="return false">
+      <label class="f wide">
+        <span>Título <small>{{ c.sources.titulo }}</small></span>
+        <input type="text" name="titulo" value="{{ c.fields.titulo }}">
+      </label>
+
+      <label class="f wide">
+        <span>Autor(es), uno por línea <small>{{ c.sources.autores }}</small></span>
+        <textarea name="autores" rows="2" placeholder="Nombre Apellido  ·  o  ·  Apellido, Nombre">{{ c.fields.autores|join("\n") }}</textarea>
+      </label>
+
+      <label class="f">
+        <span>Año <small>{{ c.sources.anio }}</small></span>
+        <input type="text" name="anio" value="{{ c.fields.anio }}" inputmode="numeric">
+      </label>
+      <label class="f">
+        <span>Fecha <small>{{ c.sources.fecha }}</small></span>
+        <input type="text" name="fecha" value="{{ c.fields.fecha }}">
+      </label>
+      <label class="f">
+        <span>Lugar <small>{{ c.sources.lugar }}</small></span>
+        <input type="text" name="lugar" value="{{ c.fields.lugar }}">
+      </label>
+      <label class="f">
+        <span>Editorial o institución <small>{{ c.sources.editorial }}</small></span>
+        <input type="text" name="editorial" value="{{ c.fields.editorial }}">
+      </label>
+
+      <label class="f">
+        <span>Tipo de documento</span>
+        <select name="tipo">
+          <option value="documento" {{ "selected" if c.fields.tipo == "documento" }}>Libro, informe o documento</option>
+          <option value="articulo" {{ "selected" if c.fields.tipo == "articulo" }}>Artículo de revista</option>
+          <option value="tesis" {{ "selected" if c.fields.tipo == "tesis" }}>Tesis</option>
+        </select>
+      </label>
+      <label class="f">
+        <span>Idioma</span>
+        <select name="idioma">
+          <option value="es" {{ "selected" if c.fields.idioma == "es" }}>Español</option>
+          <option value="en" {{ "selected" if c.fields.idioma == "en" }}>English</option>
+        </select>
+      </label>
+
+      <label class="f" data-for="articulo">
+        <span>Revista</span>
+        <input type="text" name="revista" value="{{ c.fields.revista }}">
+      </label>
+      <label class="f" data-for="articulo">
+        <span>Volumen</span>
+        <input type="text" name="volumen" value="{{ c.fields.volumen }}">
+      </label>
+      <label class="f" data-for="articulo">
+        <span>Número</span>
+        <input type="text" name="numero" value="{{ c.fields.numero }}">
+      </label>
+      <label class="f" data-for="articulo">
+        <span>Páginas</span>
+        <input type="text" name="paginas" value="{{ c.fields.paginas }}">
+      </label>
+      <label class="f" data-for="tesis">
+        <span>Grado</span>
+        <input type="text" name="grado" value="{{ c.fields.grado }}" placeholder="licenciatura, maestría, doctorado">
+      </label>
+      <label class="f">
+        <span>DOI o URL</span>
+        <input type="text" name="doi" value="{{ c.fields.doi }}">
+      </label>
+    </form>
+
+    <div class="apa">
+      <h3>Cita en formato APA 7</h3>
+      <p id="apa-out" data-plain="{{ c.apa.text }}">{{ c.apa.html|safe }}</p>
+      <button type="button" class="go" id="copy-apa">Copiar cita {{ chevron() }}</button>
+    </div>
+  </section>
 
   {% if not d.has_text %}
   <p class="notice">No se encontró texto. Probablemente es un PDF escaneado (solo imágenes) y necesitaría OCR.</p>
@@ -81,71 +163,43 @@
     <span class="right">{{ d.pages }} páginas</span>
   </div>
 </section>
-=======
-{% block title %}{{ d.filename }} · Análisis{% endblock %}
-{% block content %}
-<h1>{{ d.filename }}</h1>
 
-<div class="stats">
-  <div><b>{{ d.pages }}</b><span>páginas</span></div>
-  <div><b>{{ d.total_words }}</b><span>palabras</span></div>
-  <div><b>{{ d.unique_words }}</b><span>únicas</span></div>
-  <div><b>{{ d.reading_minutes }}</b><span>min. lectura</span></div>
-  <div><b>{{ d.tables|length }}</b><span>tablas</span></div>
-</div>
+<script>
+(function () {
+  const form = document.getElementById("ficha");
+  const out = document.getElementById("apa-out");
+  const btn = document.getElementById("copy-apa");
+  let plain = out.dataset.plain;
+  let timer;
 
-{% if not d.has_text %}
-<div class="flash">No se encontró texto. Probablemente es un PDF escaneado (imágenes); necesitarías OCR.</div>
-{% endif %}
+  function toggle() {
+    const t = form.tipo.value;
+    form.querySelectorAll("[data-for]").forEach(el => { el.hidden = el.dataset.for !== t; });
+  }
+  function refresh() {
+    const data = Object.fromEntries(new FormData(form).entries());
+    data.autores = (data.autores || "").split("\n").map(s => s.trim()).filter(Boolean);
+    fetch("{{ url_for('api_apa') }}", {
+      method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(data)
+    }).then(r => r.json()).then(j => { out.innerHTML = j.html; plain = j.text; });
+  }
+  form.addEventListener("input", () => { toggle(); clearTimeout(timer); timer = setTimeout(refresh, 250); });
 
-<section class="card">
-  <h2>Metadatos</h2>
-  {% if d.metadata %}
-  <table>{% for k, v in d.metadata.items() %}<tr><th>{{ k }}</th><td>{{ v }}</td></tr>{% endfor %}</table>
-  {% else %}<p class="muted">Sin metadatos.</p>{% endif %}
-</section>
-
-<section class="card">
-  <h2>Palabras clave</h2>
-  {% for w, c in d.top_keywords %}<span class="tag">{{ w }} <small>{{ c }}</small></span>{% else %}
-  <p class="muted">Sin datos.</p>{% endfor %}
-</section>
-
-{% if d.search is defined %}
-<section class="card">
-  <h2>Búsqueda: “{{ d.search.term }}” — {{ d.search.count }} coincidencias</h2>
-  {% for m in d.search.matches %}
-    <p><b>Pág. {{ m.page }}:</b> …{{ m.context }}…</p>
-  {% else %}<p class="muted">Sin coincidencias.</p>{% endfor %}
-</section>
-{% endif %}
-
-<section class="card">
-  <h2>Detalle por página</h2>
-  <div class="scroll"><table>
-    <tr><th>Pág.</th><th>Palabras</th><th>Imágenes</th><th>Tablas</th><th>Vista previa</th></tr>
-    {% for p in d.page_details %}
-    <tr><td>{{ p.page }}</td><td>{{ p.words }}</td><td>{{ p.images }}</td><td>{{ p.tables }}</td>
-        <td class="prev">{{ p.preview }}</td></tr>
-    {% endfor %}
-  </table></div>
-</section>
-
-{% if d.tables %}
-<section class="card">
-  <h2>Tablas detectadas</h2>
-  {% for t in d.tables %}
-    <h3>Página {{ t.page }}</h3>
-    <div class="scroll"><table>
-      {% for row in t.rows %}<tr>{% for cell in row %}<td>{{ cell or '' }}</td>{% endfor %}</tr>{% endfor %}
-    </table></div>
-  {% endfor %}
-</section>
-{% endif %}
-
-<p>
-  <a class="btn" href="{{ url_for('descargar_texto', rid=rid) }}">⬇ Descargar texto (.txt)</a>
-  <a class="btn alt" href="{{ url_for('index') }}">Analizar otro</a>
-</p>
->>>>>>> 1197832714618bdf05d0e78cf09e24a8d8a33519
+  btn.addEventListener("click", async () => {
+    const label = btn.firstChild;
+    const old = label.textContent;
+    try {
+      if (window.ClipboardItem) {
+        await navigator.clipboard.write([new ClipboardItem({
+          "text/html": new Blob([out.innerHTML], {type: "text/html"}),
+          "text/plain": new Blob([plain], {type: "text/plain"})
+        })]);
+      } else { await navigator.clipboard.writeText(plain); }
+      label.textContent = "Copiada ";
+    } catch (e) { label.textContent = "No se pudo copiar "; }
+    setTimeout(() => { label.textContent = old; }, 1800);
+  });
+  toggle();
+})();
+</script>
 {% endblock %}
