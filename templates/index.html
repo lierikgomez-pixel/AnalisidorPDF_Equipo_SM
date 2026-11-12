@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% from "_icons.html" import asterisk, arrow, chevron %}
+{% block content %}
+<section class="glass">
+  <div class="glass-top">
+    <span class="pill">Hasta 25 MB</span>
+    {{ asterisk() }}
+  </div>
+
+  <h1 class="display">
+    <span>Extrae</span>
+    <b>Texto y tablas</b>
+    <span>de cualquier</span>
+    <b>PDF</b>
+  </h1>
+
+  <p class="lede">
+    {{ arrow() }}
+    <span>Metadatos, palabras clave<br>y búsqueda de términos</span>
+  </p>
+
+  <form action="{{ url_for('analizar') }}" method="post" enctype="multipart/form-data" class="form">
+    <label class="dropzone">
+      <input type="file" name="pdf" id="pdf" accept="application/pdf,.pdf" required>
+      <span class="dz-title" id="dz-name">Elegir archivo PDF</span>
+      <span class="dz-hint">Haz clic o arrastra el archivo aquí</span>
+    </label>
+
+    <label class="field">
+      <span>Buscar palabra o frase (opcional)</span>
+      <input type="text" name="term" placeholder="Por ejemplo: metodología">
+    </label>
+
+    <div class="glass-foot">
+      <span>Solo archivos PDF</span>
+      <button type="submit" class="go">Analizar {{ chevron() }}</button>
+      <span class="right">Se borra al terminar</span>
+    </div>
+  </form>
+</section>
+
+<script>
+  const input = document.getElementById("pdf");
+  const name = document.getElementById("dz-name");
+  input.addEventListener("change", () => {
+    name.textContent = input.files.length ? input.files[0].name : "Elegir archivo PDF";
+  });
+</script>
+{% endblock %}

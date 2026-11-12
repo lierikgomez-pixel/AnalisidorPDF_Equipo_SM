@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% from "_icons.html" import asterisk, arrow, chevron %}
+{% block title %}{{ d.filename }} · Análisis{% endblock %}
+{% block content %}
+<section class="glass glass--wide">
+  <div class="glass-top">
+    <span class="pill">Análisis completo</span>
+    {{ asterisk() }}
+  </div>
+
+  <h1 class="display display--file">
+    <span>Análisis de</span>
+    <b>{{ d.filename }}</b>
+  </h1>
+
+  <div class="stats">
+    <div><strong>{{ d.pages }}</strong><span>páginas</span></div>
+    <div><strong>{{ d.total_words }}</strong><span>palabras</span></div>
+    <div><strong>{{ d.unique_words }}</strong><span>únicas</span></div>
+    <div><strong>{{ d.reading_minutes }}</strong><span>min. de lectura</span></div>
+    <div><strong>{{ d.tables|length }}</strong><span>tablas</span></div>
+  </div>
+
+  {% if not d.has_text %}
+  <p class="notice">No se encontró texto. Probablemente es un PDF escaneado (solo imágenes) y necesitaría OCR.</p>
+  {% endif %}
+
+  <section class="block">
+    <h2>Palabras clave</h2>
+    <div class="tags">
+      {% for w, c in d.top_keywords %}<span class="tag">{{ w }}<small>{{ c }}</small></span>{% else %}
+      <p class="muted">Sin datos.</p>{% endfor %}
+    </div>
+  </section>
+
+  {% if d.search is defined %}
+  <section class="block">
+    <h2>Búsqueda: “{{ d.search.term }}” — {{ d.search.count }} coincidencias</h2>
+    {% for m in d.search.matches %}
+      <p class="match"><b>Pág. {{ m.page }}</b> …{{ m.context }}…</p>
+    {% else %}<p class="muted">Sin coincidencias.</p>{% endfor %}
+  </section>
+  {% endif %}
+
+  <section class="block">
+    <h2>Metadatos</h2>
+    {% if d.metadata %}
+    <div class="scroll"><table>
+      {% for k, v in d.metadata.items() %}<tr><th>{{ k }}</th><td>{{ v }}</td></tr>{% endfor %}
+    </table></div>
+    {% else %}<p class="muted">Sin metadatos.</p>{% endif %}
+  </section>
+
+  <section class="block">
+    <h2>Detalle por página</h2>
+    <div class="scroll"><table>
+      <tr><th>Pág.</th><th>Palabras</th><th>Imágenes</th><th>Tablas</th><th>Vista previa</th></tr>
+      {% for p in d.page_details %}
+      <tr><td>{{ p.page }}</td><td>{{ p.words }}</td><td>{{ p.images }}</td><td>{{ p.tables }}</td>
+          <td class="prev">{{ p.preview }}</td></tr>
+      {% endfor %}
+    </table></div>
+  </section>
+
+  {% if d.tables %}
+  <section class="block">
+    <h2>Tablas detectadas</h2>
+    {% for t in d.tables %}
+      <h3>Página {{ t.page }}</h3>
+      <div class="scroll"><table>
+        {% for row in t.rows %}<tr>{% for cell in row %}<td>{{ cell or '' }}</td>{% endfor %}</tr>{% endfor %}
+      </table></div>
+    {% endfor %}
+  </section>
+  {% endif %}
+
+  <div class="glass-foot">
+    <a class="link" href="{{ url_for('descargar_texto', rid=rid) }}">{{ arrow() }} Descargar texto</a>
+    <a class="go" href="{{ url_for('index') }}">Analizar otro {{ chevron() }}</a>
+    <span class="right">{{ d.pages }} páginas</span>
+  </div>
+</section>
+{% endblock %}
