@@ -1,7 +1,7 @@
 # Analizador de PDFs con Flask
 
-Sube un PDF y obtén: metadatos, nº de páginas, palabras, palabras clave, tablas,
-detalle por página, búsqueda de términos y descarga del texto extraído.
+PDF: metadatos, nº de páginas, palabras, palabras clave, tablas,
+detalle por página, búsqueda de términos y descargar el texto extraído.
 
 ## Instalación
 
@@ -34,10 +34,7 @@ pdf_analyzer/
 ## Notas
 - PDFs escaneados (solo imagen) no tienen texto: necesitarían OCR (pytesseract + pdf2image).
 - Los resultados se guardan en memoria; para producción usa una base de datos y define `SECRET_KEY`.
-<<<<<<< HEAD
 
 ## Diseño
 La interfaz usa un estilo "glass" (vidrio esmerilado sobre fondo desenfocado).
-Para usar una foto real de fondo, guarda `static/bg.jpg` y descomenta la línea `--photo` al inicio de `static/style.css`.
-=======
->>>>>>> 1197832714618bdf05d0e78cf09e24a8d8a33519
+
