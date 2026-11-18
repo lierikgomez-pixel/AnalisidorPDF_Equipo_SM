@@ -2,6 +2,13 @@
 {% from "_icons.html" import asterisk, arrow, chevron %}
 {% block content %}
 <section class="glass">
+/* ───────────── Logos de inicio gay ───────────── */
+    <div class="logos">
+    <img src="{{ url_for('static', filename='logo_unca.png') }}" alt="Universidad de la Cañada">
+    <img src="{{ url_for('static', filename='logo_info.png') }}" alt="Licenciatura en Informática">
+    <img src="{{ url_for('static', filename='logo_bd.png') }}" alt="Base de datos">
+  </div>
+  
   <div class="glass-top">
     <span class="pill">Hasta 25 MB</span>
     {{ asterisk() }}
