@@ -341,3 +341,20 @@ th { font-weight: 400; font-size: .72rem; letter-spacing: .04em; text-transform:
 @media (max-width: 620px) {
   .ficha { grid-template-columns: 1fr; }
 }
+
+/* ───────────── Logos de inicio gays ───────────── */
+.logos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(1rem, 3vw, 2rem);
+  flex-wrap: wrap;
+  padding: .7rem 1.2rem;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, .92);
+}
+.logos img {
+  height: clamp(48px, 9vw, 72px);
+  width: auto;
+  object-fit: contain;
+}
